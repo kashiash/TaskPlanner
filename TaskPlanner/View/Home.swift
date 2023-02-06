@@ -9,9 +9,16 @@ import SwiftUI
 
 struct Home: View {
     /// - View Properties
+    ///
+    ///
+    @State private var weekDays: [WeekDay] = []
     @State private var currentDay: Date = .init()
     @State private var tasks: [Task] = sampleTasks
     @State private var addNewTask: Bool = false
+    @State private var pushView: Bool = false
+    @State private var snappedItem = 0.0
+    @State private var draggingItem = 0.0
+    
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             TimelineView()
@@ -49,38 +56,52 @@ struct Home: View {
     /// - Timeline View Row
     @ViewBuilder
     func TimelineViewRow(_ date: Date)->some View{
-        HStack(alignment: .top) {
-            Text(date.toString("h a"))
-                .ubuntu(14, .regular)
-                .frame(width: 45,alignment: .leading)
-            
-            /// - Filtering Tasks
-            let calendar = Calendar.current
-            let filteredTasks = tasks.filter{
-                if let hour = calendar.dateComponents([.hour], from: date).hour,
-                   let taskHour = calendar.dateComponents([.hour], from: $0.dateAdded).hour,
-                   hour == taskHour && calendar.isDate($0.dateAdded, inSameDayAs: currentDay){
-                    return true
+       
+            HStack(alignment: .top) {
+                
+                Text(date.toString("h a"))
+                    .ubuntu(14, .regular)
+                    .frame(width: 45,alignment: .leading)
+                
+                /// - Filtering Tasks
+                let calendar = Calendar.current
+                let filteredTasks = tasks.filter{
+                    if let hour = calendar.dateComponents([.hour], from: date).hour,
+                       let taskHour = calendar.dateComponents([.hour], from: $0.dateAdded).hour,
+                       hour == taskHour && calendar.isDate($0.dateAdded, inSameDayAs: currentDay){
+                        return true
+                    }
+                    return false
                 }
-                return false
-            }
-            
-            if filteredTasks.isEmpty{
-                Rectangle()
-                    .stroke(.gray.opacity(0.5), style: StrokeStyle(lineWidth: 0.5, lineCap: .butt, lineJoin: .bevel, dash: [5], dashPhase: 5))
-                    .frame(height: 0.5)
-                    .offset(y: 10)
-            }else{
-                /// - Task View
-                VStack(spacing: 10){
-                    ForEach(filteredTasks){task in
-                        TaskRow(task)
+                
+                if filteredTasks.isEmpty{
+                    Rectangle()
+                        .stroke(.gray.opacity(0.5), style: StrokeStyle(lineWidth: 0.5, lineCap: .butt, lineJoin: .bevel, dash: [5], dashPhase: 5))
+                        .frame(height: 0.5)
+                        .offset(y: 10)
+                }else{
+                    /// - Task View
+                    NavigationView{
+                    VStack(spacing: 10){
+                        ForEach(filteredTasks){task in
+                            Button{
+                                pushView.toggle()
+                                
+                            } label: {
+                                TaskRow(task)
+                            }
+                            .navigationDestination(isPresented: $pushView){
+                                TaskRow(task)
+                            }
+                            
+                        }
                     }
                 }
             }
-        }
-        .hAlign(.leading)
-        .padding(.vertical,15)
+            }
+            .hAlign(.leading)
+            .padding(.vertical,15)
+        
     }
     
     /// - Task Row
@@ -118,12 +139,22 @@ struct Home: View {
     func HeaderView()->some View{
         VStack{
             HStack{
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Today")
-                        .ubuntu(30, .light)
-                    
-                    Text("Welcome")
-                        .ubuntu(14, .light)
+                Button {
+                    currentDay = .now
+                    weekDays = Calendar.current.getDays(date: currentDay)
+                } label: {
+                    HStack(spacing: 10){
+                      
+                        Text("Today")
+                            .ubuntu(15, .regular)
+                    }
+                    .padding(.vertical,10)
+                    .padding(.horizontal,15)
+                    .background {
+                        Capsule()
+                            .fill(Color("Blue").gradient)
+                    }
+                    .foregroundColor(.white)
                 }
                 .hAlign(.leading)
                 
@@ -131,7 +162,7 @@ struct Home: View {
                     addNewTask.toggle()
                 } label: {
                     HStack(spacing: 10){
-                        Image(systemName: "plus")
+                        
                         Text("Add Task")
                             .ubuntu(15, .regular)
                     }
@@ -143,17 +174,47 @@ struct Home: View {
                     }
                     .foregroundColor(.white)
                 }
+                .hAlign(.trailing)
             }
-            
-            /// - Today Date in String
-            Text(Date().toString("MMM YYYY"))
-                .ubuntu(16, .medium)
+            HStack{
+                Button{
+                    var dateComponent = DateComponents()
+                    dateComponent.day = -7
+                    currentDay =   Calendar.current.date(byAdding: dateComponent, to: currentDay)!
+                    weekDays = Calendar.current.getDays(date: currentDay)
+                } label:{
+                    Image(systemName: "arrowtriangle.left.circle")
+                        .font(.headline)
+                }
                 .hAlign(.leading)
+                .font(.headline)
                 .padding(.top,15)
+                
+                /// - Today Date in String
+                Text(currentDay,format: .dateTime.day().month().year())
+                    .ubuntu(16, .medium)
+                    .hAlign(.leading)
+                    .padding(.top,15)
+                
+                Button{
+                    var dateComponent = DateComponents()
+                    dateComponent.day = 7
+                    currentDay =   Calendar.current.date(byAdding: dateComponent, to: currentDay)!
+                    weekDays = Calendar.current.getDays(date: currentDay)
+                } label:{
+                    Image(systemName: "arrowtriangle.right.circle")
+                        .fontWeight(.heavy)
+                        .font(.headline)
+                }
+                .hAlign(.trailing)
+              
+                .padding(.top,15)
+                
+            }
             
             /// - Current Week Row
             WeekRow()
-                .onges
+            
         }
         .padding(15)
         .background {
@@ -176,7 +237,7 @@ struct Home: View {
     @ViewBuilder
     func WeekRow()->some View{
         HStack(spacing: 0){
-            ForEach(Calendar.current.currentWeek){weekDay in
+            ForEach(weekDays){weekDay in
                 let status = Calendar.current.isDate(weekDay.date, inSameDayAs: currentDay)
                 VStack(spacing: 6){
                     Text(weekDay.string.prefix(3))
@@ -199,7 +260,34 @@ struct Home: View {
                         currentDay = weekDay.date
                     }
                 }
+                .gesture(
+                    DragGesture()
+                        .onChanged { value in
+                            draggingItem = snappedItem + value.translation.width / 400
+                        }
+                        .onEnded { value in
+                            withAnimation {
+                                var dateComponent = DateComponents()
+                                if value.predictedEndTranslation.width > 0 {
+                                    dateComponent.day = -7
+                                    draggingItem = snappedItem + 1
+                                } else {
+                                    dateComponent.day = 7
+                                    draggingItem = snappedItem - 1
+                                }
+                                snappedItem = draggingItem
+                                
+                               
+                            
+                                currentDay =   Calendar.current.date(byAdding: dateComponent, to: currentDay)!
+                                weekDays = Calendar.current.getDays(date: currentDay)
+                            }
+                        }
+                )
             }
+        }
+        .onAppear{
+            weekDays = Calendar.current.getDays(date: .now)
         }
         .padding(.vertical,10)
         .padding(.horizontal,-15)
@@ -249,6 +337,20 @@ extension Calendar{
         return hours
     }
     
+    func getDays(date: Date)->[WeekDay]{
+        guard let firstWeekDay = self.dateInterval(of: .weekOfMonth, for: date)?.start else{return []}
+        var week: [WeekDay] = []
+        for index in 0..<7{
+            if let day = self.date(byAdding: .day, value: index, to: firstWeekDay){
+                let weekDaySymbol: String = day.toString("EEEE")
+                let isToday = self.isDateInToday(day)
+                week.append(.init(string: weekDaySymbol, date: day,isToday: isToday))
+            }
+        }
+        
+        return week
+    }
+    
     /// - Returns Current Week in Array Format
     var currentWeek: [WeekDay]{
         guard let firstWeekDay = self.dateInterval(of: .weekOfMonth, for: Date())?.start else{return []}
@@ -265,10 +367,11 @@ extension Calendar{
     }
     
     /// - Used to Store Data of Each Week Day
-    struct WeekDay: Identifiable{
-        var id: UUID = .init()
-        var string: String
-        var date: Date
-        var isToday: Bool = false
-    }
+
+}
+struct WeekDay: Identifiable{
+    var id: UUID = .init()
+    var string: String
+    var date: Date
+    var isToday: Bool = false
 }
