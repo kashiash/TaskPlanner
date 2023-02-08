@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3F2EC05D2991BA340005EEB6 /* TaskDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2EC05C2991BA340005EEB6 /* TaskDetailView.swift */; };
 		AD5F78BE2965F2B20086ADF7 /* Ubuntu-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AD5F78BA2965F2B20086ADF7 /* Ubuntu-Light.ttf */; };
 		AD5F78BF2965F2B20086ADF7 /* Ubuntu-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AD5F78BB2965F2B20086ADF7 /* Ubuntu-Bold.ttf */; };
 		AD5F78C02965F2B20086ADF7 /* Ubuntu-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AD5F78BC2965F2B20086ADF7 /* Ubuntu-Regular.ttf */; };
@@ -23,6 +24,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3F2EC05C2991BA340005EEB6 /* TaskDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskDetailView.swift; sourceTree = "<group>"; };
 		AD5F78BA2965F2B20086ADF7 /* Ubuntu-Light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Ubuntu-Light.ttf"; sourceTree = "<group>"; };
 		AD5F78BB2965F2B20086ADF7 /* Ubuntu-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Ubuntu-Bold.ttf"; sourceTree = "<group>"; };
 		AD5F78BC2965F2B20086ADF7 /* Ubuntu-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Ubuntu-Regular.ttf"; sourceTree = "<group>"; };
@@ -67,6 +69,7 @@
 			isa = PBXGroup;
 			children = (
 				AD5F78C22965F2F30086ADF7 /* Home.swift */,
+				3F2EC05C2991BA340005EEB6 /* TaskDetailView.swift */,
 				AD5F78CA2965FC380086ADF7 /* AddTaskView.swift */,
 			);
 			path = View;
@@ -196,6 +199,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F2EC05D2991BA340005EEB6 /* TaskDetailView.swift in Sources */,
 				AD5F78C92965F9E20086ADF7 /* TaskCategory.swift in Sources */,
 				AD5F78CB2965FC380086ADF7 /* AddTaskView.swift in Sources */,
 				ADA7BF342965B21700C2D3A4 /* ContentView.swift in Sources */,

@@ -16,8 +16,7 @@ struct Home: View {
     @State private var tasks: [Task] = sampleTasks
     @State private var addNewTask: Bool = false
     @State private var pushView: Bool = false
-    @State private var snappedItem = 0.0
-    @State private var draggingItem = 0.0
+
     
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
@@ -81,20 +80,16 @@ struct Home: View {
                         .offset(y: 10)
                 }else{
                     /// - Task View
-                    NavigationView{
                     VStack(spacing: 10){
                         ForEach(filteredTasks){task in
                             Button{
                                 pushView.toggle()
-                                
                             } label: {
                                 TaskRow(task)
                             }
                             .navigationDestination(isPresented: $pushView){
-                                TaskRow(task)
+                                TaskDetailView(task: task)
                             }
-                            
-                        }
                     }
                 }
             }
@@ -184,7 +179,8 @@ struct Home: View {
                     weekDays = Calendar.current.getDays(date: currentDay)
                 } label:{
                     Image(systemName: "arrowtriangle.left.circle")
-                        .font(.headline)
+                        .font(.system(size: 50))
+                        .foregroundStyle(.orange.gradient)
                 }
                 .hAlign(.leading)
                 .font(.headline)
@@ -203,8 +199,8 @@ struct Home: View {
                     weekDays = Calendar.current.getDays(date: currentDay)
                 } label:{
                     Image(systemName: "arrowtriangle.right.circle")
-                        .fontWeight(.heavy)
-                        .font(.headline)
+                        .font(.system(size: 50))
+                        .foregroundStyle(.green.gradient)
                 }
                 .hAlign(.trailing)
               
@@ -263,19 +259,38 @@ struct Home: View {
                 .gesture(
                     DragGesture()
                         .onChanged { value in
-                            draggingItem = snappedItem + value.translation.width / 400
+                           
+                            
+                            withAnimation {
+                               
+                                var dateComponent = DateComponents()
+                                if value.predictedEndTranslation.width > 300 {
+                                    dateComponent.day = -1
+                                  
+                                } else {
+                                    dateComponent.day = 1
+                                    
+                                }
+                                
+                                
+                               
+                            
+                                currentDay =   Calendar.current.date(byAdding: dateComponent, to: currentDay)!
+                                weekDays = Calendar.current.getDays(date: currentDay)
+                            }
+                            
                         }
                         .onEnded { value in
                             withAnimation {
                                 var dateComponent = DateComponents()
                                 if value.predictedEndTranslation.width > 0 {
                                     dateComponent.day = -7
-                                    draggingItem = snappedItem + 1
+                                    
                                 } else {
                                     dateComponent.day = 7
-                                    draggingItem = snappedItem - 1
+                                  
                                 }
-                                snappedItem = draggingItem
+                               
                                 
                                
                             

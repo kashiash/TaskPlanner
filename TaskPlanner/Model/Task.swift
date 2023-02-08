@@ -14,6 +14,8 @@ struct Task: Identifiable{
     var taskName: String
     var taskDescription: String
     var taskCategory: Category
+    
+    static let example =   Task(dateAdded: Date(timeIntervalSince1970: 1672837009), taskName: "Loreal Ipsum", taskDescription: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.", taskCategory: .idea)
 }
 
 /// - Sample Tasks
