@@ -16,7 +16,7 @@ struct Home: View {
     @State private var tasks: [Task] = sampleTasks
     @State private var addNewTask: Bool = false
     @State private var pushView: Bool = false
-
+    
     
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
@@ -55,47 +55,47 @@ struct Home: View {
     /// - Timeline View Row
     @ViewBuilder
     func TimelineViewRow(_ date: Date)->some View{
-       
-            HStack(alignment: .top) {
-                
-                Text(date.toString("h a"))
-                    .ubuntu(14, .regular)
-                    .frame(width: 45,alignment: .leading)
-                
-                /// - Filtering Tasks
-                let calendar = Calendar.current
-                let filteredTasks = tasks.filter{
-                    if let hour = calendar.dateComponents([.hour], from: date).hour,
-                       let taskHour = calendar.dateComponents([.hour], from: $0.dateAdded).hour,
-                       hour == taskHour && calendar.isDate($0.dateAdded, inSameDayAs: currentDay){
-                        return true
-                    }
-                    return false
+        
+        HStack(alignment: .top) {
+            
+            Text(date.toString("h a"))
+                .ubuntu(14, .regular)
+                .frame(width: 45,alignment: .leading)
+            
+            /// - Filtering Tasks
+            let calendar = Calendar.current
+            let filteredTasks = tasks.filter{
+                if let hour = calendar.dateComponents([.hour], from: date).hour,
+                   let taskHour = calendar.dateComponents([.hour], from: $0.dateAdded).hour,
+                   hour == taskHour && calendar.isDate($0.dateAdded, inSameDayAs: currentDay){
+                    return true
                 }
-                
-                if filteredTasks.isEmpty{
-                    Rectangle()
-                        .stroke(.gray.opacity(0.5), style: StrokeStyle(lineWidth: 0.5, lineCap: .butt, lineJoin: .bevel, dash: [5], dashPhase: 5))
-                        .frame(height: 0.5)
-                        .offset(y: 10)
-                }else{
-                    /// - Task View
-                    VStack(spacing: 10){
-                        ForEach(filteredTasks){task in
-                            Button{
-                                pushView.toggle()
-                            } label: {
-                                TaskRow(task)
-                            }
-                            .navigationDestination(isPresented: $pushView){
-                                TaskDetailView(task: task)
-                            }
+                return false
+            }
+            
+            if filteredTasks.isEmpty{
+                Rectangle()
+                    .stroke(.gray.opacity(0.5), style: StrokeStyle(lineWidth: 0.5, lineCap: .butt, lineJoin: .bevel, dash: [5], dashPhase: 5))
+                    .frame(height: 0.5)
+                    .offset(y: 10)
+            }else{
+                /// - Task View
+                VStack(spacing: 10){
+                    ForEach(filteredTasks){task in
+                        Button{
+                            pushView.toggle()
+                        } label: {
+                            TaskRow(task)
+                        }
+                        .navigationDestination(isPresented: $pushView){
+                            TaskDetailView(task: task)
+                        }
                     }
                 }
             }
-            }
-            .hAlign(.leading)
-            .padding(.vertical,15)
+        }
+        .hAlign(.leading)
+        .padding(.vertical,15)
         
     }
     
@@ -139,7 +139,7 @@ struct Home: View {
                     weekDays = Calendar.current.getDays(date: currentDay)
                 } label: {
                     HStack(spacing: 10){
-                      
+                        
                         Text("Today")
                             .ubuntu(15, .regular)
                     }
@@ -203,7 +203,7 @@ struct Home: View {
                         .foregroundStyle(.green.gradient)
                 }
                 .hAlign(.trailing)
-              
+                
                 .padding(.top,15)
                 
             }
@@ -258,28 +258,19 @@ struct Home: View {
                 }
                 .gesture(
                     DragGesture()
-                        .onChanged { value in
-                           
-                            
-                            withAnimation {
-                               
-                                var dateComponent = DateComponents()
-                                if value.predictedEndTranslation.width > 300 {
-                                    dateComponent.day = -1
-                                  
-                                } else {
-                                    dateComponent.day = 1
-                                    
-                                }
-                                
-                                
-                               
-                            
-                                currentDay =   Calendar.current.date(byAdding: dateComponent, to: currentDay)!
-                                weekDays = Calendar.current.getDays(date: currentDay)
-                            }
-                            
-                        }
+                    //                        .onChanged { value in
+                    //                            withAnimation {
+                    //                                var dateComponent = DateComponents()
+                    //                                if value.predictedEndTranslation.width > 300 {
+                    //                                    dateComponent.day = -1
+                    //                                } else {
+                    //                                    dateComponent.day = 1
+                    //                                }
+                    //                                currentDay =   Calendar.current.date(byAdding: dateComponent, to: currentDay)!
+                    //                                weekDays = Calendar.current.getDays(date: currentDay)
+                    //                            }
+                    //
+                    //                        }
                         .onEnded { value in
                             withAnimation {
                                 var dateComponent = DateComponents()
@@ -288,12 +279,7 @@ struct Home: View {
                                     
                                 } else {
                                     dateComponent.day = 7
-                                  
                                 }
-                               
-                                
-                               
-                            
                                 currentDay =   Calendar.current.date(byAdding: dateComponent, to: currentDay)!
                                 weekDays = Calendar.current.getDays(date: currentDay)
                             }
@@ -382,7 +368,7 @@ extension Calendar{
     }
     
     /// - Used to Store Data of Each Week Day
-
+    
 }
 struct WeekDay: Identifiable{
     var id: UUID = .init()
